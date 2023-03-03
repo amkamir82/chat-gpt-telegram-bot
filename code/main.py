@@ -17,7 +17,8 @@ def ask_question(update, context):
 
 
 def ask_image(update, context):
-    response = dall_e.request_to_dall_e()
+    image = update.message.text
+    response = dall_e.request_to_dall_e(image)
     print(response)
     context.bot.send_photo(chat_id=update.message.chat_id, photo=response,
                            reply_to_message_id=update.message.message_id)
@@ -37,3 +38,5 @@ if __name__ == "__main__":
     openai.api_key = config.OPEN_AI_API_KEY
     set_up_bot().start_polling()
     # ask_image.request_to_dall_e()
+
+
