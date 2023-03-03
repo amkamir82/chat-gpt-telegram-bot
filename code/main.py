@@ -2,6 +2,7 @@ import openai
 from telegram.ext.updater import Updater
 from telegram.ext.commandhandler import CommandHandler
 import config
+from openai_tools import chat_gpt, dall_e
 
 
 def start(update, context):
@@ -10,18 +11,16 @@ def start(update, context):
 
 def ask_question(update, context):
     question = update.message.text
-    response = request_to_chat_gpt(question)
+    response = chat_gpt.request_to_chat_gpt(question)
     context.bot.send_message(chat_id=update.message.chat_id, text=response,
                              reply_to_message_id=update.message.message_id)
 
 
-def request_to_chat_gpt(question):
-    completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": question}]
-    )
-    response = completion.choices[0].message.content
-    return response
+def ask_image(update, context):
+    response = dall_e.request_to_dall_e()
+    print(response)
+    context.bot.send_photo(chat_id=update.message.chat_id, photo=response,
+                           reply_to_message_id=update.message.message_id)
 
 
 def set_up_bot():
@@ -29,10 +28,12 @@ def set_up_bot():
     dispatcher = updater.dispatcher
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('gpt', ask_question))
+    dispatcher.add_handler(CommandHandler('dalle', ask_image))
+
     return updater
 
 
 if __name__ == "__main__":
     openai.api_key = config.OPEN_AI_API_KEY
     set_up_bot().start_polling()
-
+    # ask_image.request_to_dall_e()
