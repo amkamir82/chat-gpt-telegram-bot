@@ -3,6 +3,7 @@ from pyrogram.handlers import MessageHandler
 
 import config
 from chat_gpt import request_to_chat_gpt
+from telegram import services
 
 app = Client(
     "dutchman-chat-gpt-bot",
@@ -27,6 +28,31 @@ async def get_all_replies(chat_id, message_id):
     return replies
 
 
+async def initial_responding(client, message):
+    chat_id = message.chat.id
+    message_id = message.id
+
+    all_replies = await get_all_replies(chat_id, message_id)
+
+    discussion = [{"role": "user", "content": message.text}]
+    for reply in all_replies:
+        discussion.append({"role": "system" if reply.from_user.id == 6656520488 else "user", "content": reply.text})
+
+    response = await request_to_chat_gpt(discussion[::-1])
+
+    await client.send_message(chat_id=message.chat.id, text=response, reply_to_message_id=message.id)
+
+    print(message)
+    await services.save_messages_from_users(
+        {"First Name": f"{message.from_user.first_name}", "Username": f"@{message.from_user.username}", "Chat ID":
+            f"{message.from_user.id}", "Message": f"{message.text}", "Response": f"{response}",
+         "timestamp": f"{message.date}"})
+
+    print(
+        f"First Name: {message.from_user.first_name}\nUsername: @{message.from_user.username}\nChat ID: "
+        f"{message.from_user.id}\nMessage: {message.text}\nResponse: {response}\n\n\n")
+
+
 async def main(client, message):
     if message.text == "/start":
         await app.send_message(message.chat.id,
@@ -40,21 +66,8 @@ async def main(client, message):
         await app.send_message(message.chat.id,
                                "شما بیش از حد پیام داده‌اید و دیگر امکان سول پرسیدن تا مدتی را ندارید.")
     else:
-        chat_id = message.chat.id
-        message_id = message.id
-
-        all_replies = await get_all_replies(chat_id, message_id)
-
-        discussion = [{"role": "user", "content": message.text}]
-        for reply in all_replies:
-            discussion.append({"role": "system" if reply.from_user.id == 6656520488 else "user", "content": reply.text})
-
-        response = await request_to_chat_gpt(discussion[::-1])
-
-        await client.send_message(chat_id=message.chat.id, text=response, reply_to_message_id=message.id)
-        print(
-            f"First Name: {message.from_user.first_name}\nUsername: @{message.from_user.username}\nChat ID: "
-            f"{message.from_user.id}\nMessage: {message.text}\nResponse: {response}\n\n\n")
+        if await services.update_limits(message):
+            await initial_responding(client, message)
 
 
 def run():
