@@ -33,3 +33,14 @@ async def update_limits(message):
     messages_sent += 1
     user_data["messages_sent"] = messages_sent
     return True
+
+
+async def decrease_limit_for_user(message):
+    user_id = message.from_user.id
+
+    user_data = user_messages[user_id]
+
+    messages_sent = user_data["messages_sent"]
+
+    messages_sent -= 1
+    user_data["messages_sent"] = messages_sent

@@ -38,7 +38,11 @@ async def initial_responding(client, message):
     for reply in all_replies:
         discussion.append({"role": "system" if reply.from_user.id == 6656520488 else "user", "content": reply.text})
 
-    response = await request_to_chat_gpt(discussion[::-1])
+    try:
+        response = await request_to_chat_gpt(discussion[::-1])
+    except:
+        response = "به دلیل حجم بالای درخواست‌ها، openai پاسخگو نمی‌باشد.\n\n لطفا ۳۰ دقیقه‌ی دیگر تلاش نمایید."
+        await services.decrease_limit_for_user(message)
 
     await client.send_message(chat_id=message.chat.id, text=response, reply_to_message_id=message.id)
 
