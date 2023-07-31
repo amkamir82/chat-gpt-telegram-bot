@@ -6,7 +6,7 @@ from chat_gpt import request_to_chat_gpt
 
 
 app = Client(
-    "my_bot",
+    "dutchman-chat-gpt-bot",
     api_id=config.API_ID, api_hash=config.API_HASH,
     bot_token=config.BOT_TOKEN
 )
