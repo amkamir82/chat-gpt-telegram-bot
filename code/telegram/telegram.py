@@ -42,7 +42,6 @@ async def initial_responding(client, message):
 
     await client.send_message(chat_id=message.chat.id, text=response, reply_to_message_id=message.id)
 
-    print(message)
     await services.save_messages_from_users(
         {"First Name": f"{message.from_user.first_name}", "Username": f"@{message.from_user.username}", "Chat ID":
             f"{message.from_user.id}", "Message": f"{message.text}", "Response": f"{response}",
