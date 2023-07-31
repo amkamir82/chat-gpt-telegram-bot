@@ -4,7 +4,6 @@ from pyrogram.handlers import MessageHandler
 import config
 from chat_gpt import request_to_chat_gpt
 
-
 app = Client(
     "dutchman-chat-gpt-bot",
     api_id=config.API_ID, api_hash=config.API_HASH,
@@ -29,10 +28,6 @@ async def get_all_replies(chat_id, message_id):
 
 
 async def main(client, message):
-    print(
-        f"First Name: {message.from_user.first_name}\nUsername: @{message.from_user.username}\nChat ID: "
-        f"{message.from_user.id}\nMessage: {message.text}")
-
     if message.text == "/start":
         await app.send_message(message.chat.id,
                                "سلام! به Dutchman Chat-GPT Bot خوش آمدید. این بات توسط @its_dutchman زده شده است. اگر سوالی داشتید یا پیشنهادی داشتید حتما پیام بدید. همچنین برای آشنایی با نحوه کارکرد بات روی /help بزنید.")
@@ -54,10 +49,9 @@ async def main(client, message):
         response = await request_to_chat_gpt(discussion[::-1])
 
         await client.send_message(chat_id=message.chat.id, text=response, reply_to_message_id=message.id)
-        print(f"Response: {response}")
-
-    print("=" * 20)
-
+        print(
+            f"First Name: {message.from_user.first_name}\nUsername: @{message.from_user.username}\nChat ID: "
+            f"{message.from_user.id}\nMessage: {message.text}\nResponse: {response}\n\n\n")
 
 def run():
     app.add_handler(MessageHandler(main))
