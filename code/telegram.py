@@ -36,6 +36,9 @@ async def main(client, message):
         await app.send_message(message.chat.id,
                                "برای استفاده از این بات، تنها کافی است که سوال خودتان را تایپ کرده و ارسال کنید. در صورتی که خواستید راجع به همان مکالمه فعلی سوال بپرسید، کافی است سوال جدیدتان را در ریپلای به پیام بات بپرسید.\n\n برای مثال اگر از بات پرسیدید که هوا چطور است و بات به شما جواب داد، اگر خواستید بگویید نه منظورم هوای امروز است، نیاز است که به پیام خود بات ریپلای بزنید.\n\n اگر میخواید مکالمه جدیدی شروع کنید تنها کافی است سوال‌تان را بدون ریپلای به هیچ پیامی ارسال کنید.\n\n اگر سوالی دارید به آیدی @its_dutchman پیام دهید.")
 
+    elif str(message.chat.id) in config.BLOCK_LIST_CHATS:
+        await app.send_message(message.chat.id,
+                               "شما بیش از حد پیام داده‌اید و دیگر امکان سول پرسیدن تا مدتی را ندارید.")
     else:
         chat_id = message.chat.id
         message_id = message.id
@@ -52,6 +55,7 @@ async def main(client, message):
         print(
             f"First Name: {message.from_user.first_name}\nUsername: @{message.from_user.username}\nChat ID: "
             f"{message.from_user.id}\nMessage: {message.text}\nResponse: {response}\n\n\n")
+
 
 def run():
     app.add_handler(MessageHandler(main))
